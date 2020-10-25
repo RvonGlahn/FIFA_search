@@ -1,104 +1,75 @@
-import numpy as np
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
+import json
+import csv
+
+player_csv = r"players_21.csv"
 
 
-sns.set(style="ticks")
+def load_attributes():
+    """
+    :return:
+        attribute_list: all attributes for Players to search
+        positionen:     all positions of Players
+    """
+    with open(player_csv, newline='') as f:
+        reader = csv.reader(f)
+        row1 = next(reader)
+    indices = [3, 5, 8, 12, 20, 21] + list(range(24, 60)) + list(range(72, 78))
+    attribute_list = [row1[i] for i in indices]
+    positionen = [row1[i] for i in range(79, 106)]
+    return attribute_list, positionen
 
 
-def load_data():
-    player_stats = ["short_name","age","height_cm","club","overall","potential","value_eur","wage_eur",
-                    "player_positions","preferred_foot","international_reputation","weak_foot",
-                    "body_type","release_clause_eur","team_position","loaned_from","joined","contract_valid_until",
-                    "nation_position","pace","shooting","passing","dribbling","defending","physic",
-                    "player_traits","attacking_crossing","attacking_finishing","attacking_heading_accuracy",
-                    "attacking_short_passing","attacking_volleys","skill_dribbling","skill_curve","skill_fk_accuracy",
-                    "skill_long_passing","skill_ball_control","movement_acceleration","movement_sprint_speed","movement_agility",
-                    "movement_reactions","movement_balance","power_shot_power","power_jumping","power_stamina",
-                    "power_strength","power_long_shots","mentality_aggression","mentality_interceptions",
-                    "mentality_positioning","mentality_vision","mentality_penalties","mentality_composure","defending_marking",
-                    "defending_standing_tackle","defending_sliding_tackle"]
-    
-    complete_player_df = pd.read_csv("players_21.csv", low_memory=False)
-    
-    player_df = complete_player_df[player_stats]
-    del complete_player_df
-    # Few rows of data
-    return player_df
+def load_data(col=True):
+    if col:
+        return pd.read_csv(player_csv, low_memory=False)
+    else:
+        return pd.read_csv(player_csv, low_memory=False, usecols=["Name"])
 
 
-def preprocess_data(data):
-    for column in data: 
-        data[column]= data[column].astype('str')
-    return data
+def search_player(name="", position="", age=99, attribute1="", value1=99, attribute2="", value2=99):
+    """
+    filters df for all params that aint empty
+    :return:
+    """
+    df = load_data()
+    if name != "":
+        df = df[df.Name == name]
+    if position != "":
+        df = df[df.BP == position]
+    if age != 99:
+        df = df[df.Age == age]
+    if attribute1 != "":
+        df = df[df[attribute1] >= value1]
+    if attribute2 != "":
+        df = df[df[attribute2] >= value2]
+    return df
 
 
-def get_positions(df):
-    positions = df.player_positions.unique()
-    pos_liste = []
-    for posis in positions:
-        posis = posis.split(", ")
-        for pos in posis:
-            if pos not in pos_liste:
-                pos_liste.append(pos)
-    return pos_liste,
+def handle_request(json_data):
+    """
+
+    :param json_data: json request from search
+    :return:
+        json that has all infos about filtered players
+    """
+    req = json.loads(json_data)
+    players = search_player(req['name'], req['position'], req['age'], req['attribute1'], req['value1'],
+                            req['attribute2'], req['value2'])
+    return players.to_json(orient="split")
 
 
-def search_player(df):
-    pos = "CB"
-    max_age = 20
-    min_pot = 84
-    min_overall = 60
-    max_wage = 10000
-    max_value = 1500000
-    
-    return df[(df.player_positions == pos) & (df.potential >= min_pot) & (df.overall >= min_overall) & (df.age <= max_age) & (df.wage_eur <= max_wage) & (df.value_eur <= max_value)]
-
-
-def print_result(df):
-
-    strip_list = ["short_name", "age", "height_cm", "club", "overall", "potential", "value_eur", "wage_eur",
-                  "movement_acceleration", "skill_ball_control", "movement_agility", "power_stamina",
-                  "player_positions", "preferred_foot", "release_clause_eur", "contract_valid_until", "pace",
-                  "shooting", "passing", "dribbling", "defending", "physic"]
-    df_strip = df[strip_list]    
-    
-    df_print = df_strip[["short_name", "age", "height_cm", "club", "overall", "potential", "value_eur", "wage_eur",
-                         "movement_acceleration", "skill_ball_control", "movement_agility", "power_stamina",
-                         "player_positions", "preferred_foot", "release_clause_eur", "contract_valid_until"]]
-    
-    print(df.short_name)
-    
-    count = 1
-    for row in df_print.iterrows():
-        for entry in row:
-            print(entry)
-        count += 1
-        if count > 15:
-            break
-     
-    df_diagramm = df_strip[["short_name", "overall", "pace", "shooting", "passing", "dribbling", "defending", "physic"]]
-    '''
-    sns.relplot(x="shooting", y="pace", hue="short_name", 
-            sizes=(40, 400), alpha=.5, palette="muted",
-            height=6, data=df_diagramm)
-    '''        
-    df_diagramm.plot(x="short_name", y=["overall", "pace", "shooting", "passing", "dribbling", "defending", "physic"],
-                     kind="bar")
-    plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+def get_suggestion(subname):
+    series = load_data(False)
+    name_suggest = [name for name in series['Name'].to_list() if subname in name]
+    return name_suggest
 
 
 if __name__ == "__main__":
-    df_players = load_data()
-    # df_prep = preprocess_data(df.select_dtypes(include='object'))
-    # print(df.info(verbose=True))
-    
-    # positions = get_positions(df)
-    # print("Choose from one of the following positions: \n")
-    # for w in positions:
-    #   print(w)
+    req_json = '{ "name":"" , "position":"" , "age":30, "attribute1":"POT", "value1":85 ,' \
+               '"attribute2":"OVA", "value2":85}'
 
-    df_res = search_player(df_players)
-    
-    print_result(df_res)
+    print(get_suggestion("Ronal"))
+    (attributes, positions) = load_attributes()
+    json = handle_request(req_json)
+    print(json)
