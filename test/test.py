@@ -13,7 +13,7 @@ def test_search_player():
 
 
 def test_handle_request():
-    answer = ["Name","Age","OVA","LCB","CB","RCB","RB","GK"]
+    answer = ["Name", "Age", "OVA", "LCB", "CB", "RCB", "RB", "GK"]
 
     req_json = '{ "name":"" , "position":"" , "age":30, "attribute1":"POT", "value1":85 ,' \
                '"attribute2":"OVA", "value2":85}'
