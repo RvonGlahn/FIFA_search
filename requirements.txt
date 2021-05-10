@@ -3,3 +3,4 @@ pandas
 pytest
 python-dotenv
 flask
+pre-commit
