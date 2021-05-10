@@ -124,9 +124,6 @@ class SearchPlayers:
         name_suggest = [name for name in self.df["Name"].to_list() if subname in name]
         return name_suggest
 
-    def suggest_similar_player(self):
-        pass
-
 
 if __name__ == "__main__":
     req_json = (
@@ -136,5 +133,5 @@ if __name__ == "__main__":
 
     search = SearchPlayers()
     print(search.get_suggestion("Ronal"))
-    json_data = search.get_players(req_json)
-    print(json_data)
+    json_dat = search.get_players(req_json)
+    print(json_dat)
