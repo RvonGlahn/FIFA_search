@@ -22,17 +22,16 @@ def test_set_attributes():
 @pytest.mark.parametrize("potential", ["80", "85", "75", ""])
 @pytest.mark.parametrize("name", ["Cristiano", "Lewand", "Benzema", "Messi", ""])
 def test_get_players(name, potential):
-    test_req = json.dumps(
-        {
-            "name": name,
-            "position": "ST",
-            "age": "35",
-            "ability1name": "potential",
-            "ability1value": potential,
-            "ability2name": "overall",
-            "ability2value": "80",
-        }
-    )
+    test_req = {
+        "name": name,
+        "position": "ST",
+        "age": "35",
+        "ability1Name": "potential",
+        "ability1Value": potential,
+        "ability2Name": "overall",
+        "ability2Value": "80",
+    }
+
     test_search = SearchPlayers().get_players(test_req)
     assert any(param in test_search for param in [potential, name])
 
@@ -41,17 +40,16 @@ def test_get_players(name, potential):
 @pytest.mark.parametrize("potential", ["800", "85", "75", "-222"])
 @pytest.mark.parametrize("name", ["Cristwiano", "Lewaernd", "Benzerwema", "Mesawesi"])
 def test_false_get_players(name, potential, overall):
-    test_req = json.dumps(
-        {
-            "name": name,
-            "position": "ST",
-            "age": "35",
-            "ability1name": "potential",
-            "ability1value": potential,
-            "ability2name": "overall",
-            "ability2value": overall,
-        }
-    )
+    test_req = {
+        "name": name,
+        "position": "ST",
+        "age": "35",
+        "ability1Name": "potential",
+        "ability1Value": potential,
+        "ability2Name": "overall",
+        "ability2Value": overall,
+    }
+
     test_search = SearchPlayers().get_players(test_req)
     print(test_search)
     assert name not in test_search
@@ -59,17 +57,16 @@ def test_false_get_players(name, potential, overall):
 
 @pytest.mark.parametrize("age", ["100", "25", "12", "-12", "35"])
 def test_age_get_players(age):
-    test_req = json.dumps(
-        {
-            "name": "",
-            "position": "",
-            "age": age,
-            "ability1name": "potential",
-            "ability1value": 80,
-            "ability2name": "overall",
-            "ability2value": "80",
-        }
-    )
+    test_req = {
+        "name": "",
+        "position": "",
+        "age": age,
+        "ability1Name": "potential",
+        "ability1Value": 80,
+        "ability2Name": "overall",
+        "ability2Value": "80",
+    }
+
     search_dict = json.loads(SearchPlayers().get_players(test_req))
 
     if 16 < int(age):
@@ -80,7 +77,7 @@ def test_age_get_players(age):
 
 def test_get_attributes_json():
     search = SearchPlayers()
-    assert type(search.get_attributes_json()) == str
+    assert type(search.get_attributes()) == dict
 
 
 @pytest.mark.parametrize("name", ["Cristi", "Lewand", "Benzema", "Messi", ""])
