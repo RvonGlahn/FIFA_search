@@ -70,8 +70,7 @@ def test_age_get_players(age):
             "ability2value": "80",
         }
     )
-    test_res = SearchPlayers().get_players(test_req)
-    search_dict = json.loads(test_res)
+    search_dict = json.loads(SearchPlayers().get_players(test_req))
 
     if 16 < int(age):
         assert any(search_dict.values())
