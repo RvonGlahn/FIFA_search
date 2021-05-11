@@ -1,7 +1,6 @@
 import pandas as pd
-import json
 import os
-from typing import List
+from typing import List, Dict
 
 FILE_PATH = os.path.dirname(__file__)
 
@@ -73,21 +72,19 @@ class SearchPlayers:
             "skills": column_names[39:79],
         }
 
-    def get_players(self, json_data: str) -> str:
+    def get_players(self, req: Dict) -> str:
         """
         Takes search attributes as input and provides df with matching palyers
 
         Parameters
         ----------
-        json_data: str
-            json string that contains user request data
+        req: Dict
+            dict that contains user request data
 
         Returns
         -------
         str
         """
-        req = json.loads(json_data)
-
         search_df = self.df
 
         if req["name"]:
@@ -101,29 +98,32 @@ class SearchPlayers:
         if req["age"]:
             search_df = search_df[search_df["age"] <= int(req["age"])]
 
-        if req["ability1name"] and req["ability1value"]:
+        if req["ability1Name"] and req["ability1Value"]:
             search_df = search_df[
-                search_df[req["ability1name"]] >= int(req["ability1value"])
+                search_df[req["ability1Name"]] >= int(req["ability1Value"])
             ]
 
-        if req["ability2name"] and req["ability2value"]:
+        if req["ability2Name"] and req["ability2Value"]:
             search_df = search_df[
-                search_df[req["ability2name"]] >= int(req["ability2value"])
+                search_df[req["ability2Name"]] >= int(req["ability2Value"])
             ]
 
         search_df = search_df.head(20)
-
+        # TODO: Format Players so that they are easier to process
         return search_df.to_json()
 
-    def get_attributes_json(self) -> str:
+    def _build_player_dict(self, df: pd.DataFrame) -> Dict:
+        pass
+
+    def get_attributes(self) -> Dict:
         """
         Provides attribute names of dataset as json for info, positions and skills.
 
         Returns
         -------
-        str
+        Dict
         """
-        return json.dumps(self.attributes)
+        return self.attributes
 
     def get_suggestion(self, subname: str) -> List[str]:
         """
@@ -144,17 +144,15 @@ class SearchPlayers:
 
 
 if __name__ == "__main__":  # pragma: no cover
-    req_json = json.dumps(
-        {
-            "name": "Neymar",
-            "position": "CAM",
-            "age": "3",
-            "ability1name": "potential",
-            "ability1value": "80",
-            "ability2name": "overall",
-            "ability2value": "80",
-        }
-    )
+    req_json = {
+        "name": "Neymar",
+        "position": "CAM",
+        "age": "3",
+        "ability1Name": "potential",
+        "ability1Value": "80",
+        "ability2Name": "overall",
+        "ability2Value": "80",
+    }
 
     search = SearchPlayers()
     print(search.get_suggestion("Ronal"))
