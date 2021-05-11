@@ -1,6 +1,7 @@
 import pandas as pd
 import json
 import os
+from typing import List
 
 FILE_PATH = os.path.dirname(__file__)
 
@@ -20,8 +21,8 @@ class SearchPlayers:
         self.df = pd.DataFrame()
         self.attributes = {}
 
-        self._set_attributes()
         self.update_dataset(self.year)
+        self._set_attributes()
 
     def update_dataset(self, year: str) -> None:
         """
@@ -58,7 +59,7 @@ class SearchPlayers:
                 "potential",
                 "value_eur",
                 "wage_eur",
-                "player_positons",
+                "player_positions",
                 "joined",
                 "contract_valid_until",
                 "pace",
@@ -90,23 +91,27 @@ class SearchPlayers:
         search_df = self.df
 
         if req["name"]:
-            search_df = search_df[search_df["name"].str.contains(req["name"])]
+            search_df = search_df[search_df["short_name"].str.contains(req["name"])]
 
         if req["position"]:
-            search_df = search_df[search_df["player_positons"] == req["position"]]
+            search_df = search_df[
+                search_df["player_positions"].str.contains(req["position"])
+            ]
 
         if req["age"]:
-            search_df = search_df[search_df.age >= req["age"]]
+            search_df = search_df[search_df["age"] <= int(req["age"])]
 
-        if req["ability1name"]:
+        if req["ability1name"] and req["ability1value"]:
             search_df = search_df[
-                search_df[req["ability1name"]] >= int(req["ability1Value"])
+                search_df[req["ability1name"]] >= int(req["ability1value"])
             ]
 
-        if req["ability2Name"]:
+        if req["ability2name"] and req["ability2value"]:
             search_df = search_df[
-                search_df[req["ability2Name"]] >= int(req["ability2Value"])
+                search_df[req["ability2name"]] >= int(req["ability2value"])
             ]
+
+        search_df = search_df.head(20)
 
         return search_df.to_json()
 
@@ -120,15 +125,24 @@ class SearchPlayers:
         """
         return json.dumps(self.attributes)
 
-    def get_suggestion(self, subname):
-        name_suggest = [name for name in self.df["Name"].to_list() if subname in name]
+    def get_suggestion(self, subname: str) -> List[str]:
+        name_suggest = [
+            name for name in self.df["short_name"].to_list() if subname in name
+        ]
         return name_suggest
 
 
-if __name__ == "__main__":
-    req_json = (
-        '{ "name":"" , "position":"" , "age":30, "ability1Name":"POT", "ability1Value":80 , '
-        '"ability2Name":"OVA", "ability2Value":80}'
+if __name__ == "__main__":  # pragma: no cover
+    req_json = json.dumps(
+        {
+            "name": "Neymar",
+            "position": "CAM",
+            "age": "3",
+            "ability1name": "potential",
+            "ability1value": "80",
+            "ability2name": "overall",
+            "ability2value": "80",
+        }
     )
 
     search = SearchPlayers()
