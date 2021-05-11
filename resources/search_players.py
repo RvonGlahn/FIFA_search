@@ -84,7 +84,7 @@ class SearchPlayers:
 
         Returns
         -------
-        pd.DataFrame
+        str
         """
         req = json.loads(json_data)
 
@@ -126,6 +126,17 @@ class SearchPlayers:
         return json.dumps(self.attributes)
 
     def get_suggestion(self, subname: str) -> List[str]:
+        """
+        Provides suggestion for player names in dataset
+        Parameters
+        ----------
+        subname : str
+            part of name that gets checked for suggestion
+
+        Returns
+        -------
+        List[str]
+        """
         name_suggest = [
             name for name in self.df["short_name"].to_list() if subname in name
         ]
