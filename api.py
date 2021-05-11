@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = flask.Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 
 # Use the fixer if Proxy causes issues
@@ -33,8 +33,9 @@ def api_route():
     )
 
 
-@app.route("/api/suggest/<string:part>", methods=["GET"])
-def suggest_name(part):
+@app.route("/api/suggest", methods=["GET"])
+def suggest_name():
+    part = request.args.get("part", "")
     return jsonify(fifa_search.get_suggestion(part))
 
 
@@ -45,12 +46,11 @@ def search_players():
 
 @app.route("/api/attributes", methods=["GET"])
 def attribute_list():
-    return fifa_search.get_attributes_json()
+    return fifa_search.get_attributes()
 
 
 @app.errorhandler(404)
-def page_not_found(e):
-    print(e)
+def page_not_found(error):
     return "<h1>404</h1><p>The resource could not be found.</p>", 404
 
 
