@@ -57,11 +57,11 @@ def configure_routes(app):
 
     @app.route("/api/search", methods=["POST"])
     def search_players():
-        return jsonify(fifa_search.get_players(json.loads(request.data)))
+        return fifa_search.get_players(json.loads(request.data))
 
     @app.route("/api/attributes", methods=["GET"])
     def attribute_list():
-        return fifa_search.get_attributes()
+        return jsonify(fifa_search.get_attributes())
 
 
 def configure_error_handlers(app):
