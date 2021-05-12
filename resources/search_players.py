@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 from typing import List, Dict
+import json
 
 FILE_PATH = os.path.dirname(__file__)
 
@@ -108,12 +109,40 @@ class SearchPlayers:
                 search_df[req["ability2Name"]] >= int(req["ability2Value"])
             ]
 
-        search_df = search_df.head(20)
-        # TODO: Format Players so that they are easier to process
-        return search_df.to_json()
+        search_df = search_df.head(20).fillna(0)
+        del search_df["player_traits"]
 
-    def _build_player_dict(self, df: pd.DataFrame) -> Dict:
-        pass
+        player_list = self._build_player_dict(search_df)
+        # TODO: Format Players so that they are easier to process
+        return json.dumps(player_list)
+
+    def _build_player_dict(self, df: pd.DataFrame) -> List:
+        """
+        Build dictionary with dict format that can be easily handled by frontend
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            dataframe with search results
+
+        Returns
+        -------
+        List
+        """
+        players = []
+        position_list = list(self.df.columns.to_list()[80:-1])
+        skill_list = self.attributes["skills"].copy()
+        skill_list.remove("player_traits")
+
+        for (index_label, player) in df.iterrows():
+            player_dict = {
+                "info": player[self.attributes["info"]].to_dict(),
+                "positions": player[position_list].to_dict(),
+                "skills": player[skill_list].to_dict(),
+            }
+            players.append(player_dict)
+
+        return players
 
     def get_attributes(self) -> Dict:
         """
@@ -145,9 +174,9 @@ class SearchPlayers:
 
 if __name__ == "__main__":  # pragma: no cover
     req_json = {
-        "name": "Neymar",
+        "name": "",
         "position": "CAM",
-        "age": "3",
+        "age": "30",
         "ability1Name": "potential",
         "ability1Value": "80",
         "ability2Name": "overall",
