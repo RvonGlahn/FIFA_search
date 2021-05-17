@@ -2,6 +2,7 @@ import pandas as pd
 import os
 from typing import List, Dict
 import json
+import re
 
 FILE_PATH = os.path.dirname(__file__)
 
@@ -140,6 +141,12 @@ class SearchPlayers:
                 "positions": player[position_list].to_dict(),
                 "skills": player[skill_list].to_dict(),
             }
+            dict_keys = player_dict["skills"].copy()
+            for key in dict_keys.keys():
+                player_dict["skills"][re.sub(r"^.*?_", "", key)] = player_dict[
+                    "skills"
+                ].pop(key)
+
             players.append(player_dict)
 
         return players
@@ -152,7 +159,12 @@ class SearchPlayers:
         -------
         Dict
         """
-        return self.attributes
+        attributes = self.attributes.copy()
+        attributes["skills"] = [
+            re.sub(r"^.*?_", "", skill) for skill in attributes["skills"]
+        ]
+
+        return attributes
 
     def get_suggestion(self, subname: str) -> List[str]:
         """
@@ -184,6 +196,7 @@ if __name__ == "__main__":  # pragma: no cover
     }
 
     search = SearchPlayers()
+    search.get_attributes()
     print(search.get_suggestion("Ronal"))
     json_dat = search.get_players(req_json)
     print(json_dat)
