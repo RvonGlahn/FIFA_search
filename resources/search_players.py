@@ -27,7 +27,7 @@ class SearchPlayers:
 
     def update_dataset(self, year: str) -> None:
         """
-        Updates year, path and dataframe for provided year.
+        Updates year, path and dataframe for provided year. Rename skills.
 
         Parameters
         ----------
@@ -40,6 +40,17 @@ class SearchPlayers:
         self.year = year
         data_path = os.path.join(FILE_PATH, "data", "players_" + year + ".csv")
         self.df = pd.read_csv(data_path, low_memory=False, encoding="utf-8")
+        # self.df = self.df.drop(['player_traits'], axis=1)
+
+        new_skill_names = [
+            re.sub(r"^.*?_", "", c) for c in self.df.columns[39:75]
+        ] + self.df.columns[75:79].tolist()
+        new_columns = (
+            self.df.columns[0:39].tolist()
+            + new_skill_names
+            + self.df.columns[79::].tolist()
+        )
+        self.df.columns = new_columns
 
     def _set_attributes(self):
         """
@@ -63,15 +74,9 @@ class SearchPlayers:
                 "player_positions",
                 "joined",
                 "contract_valid_until",
-                "pace",
-                "shooting",
-                "dribbling",
-                "passing",
-                "defending",
-                "physic",
             ],
-            "positions": list(map(str.upper, column_names[80:-1])),
-            "skills": column_names[39:79],
+            "positions": list(map(str.upper, column_names[80::])),
+            "skills": ["overall", "potential"] + column_names[39:79],
         }
 
     def get_players(self, req: Dict) -> str:
@@ -100,6 +105,9 @@ class SearchPlayers:
         if req["age"]:
             search_df = search_df[search_df["age"] <= int(req["age"])]
 
+        if req["player_value"]:
+            search_df = search_df[search_df["value_eur"] <= int(req["player_value"])]
+
         if req["ability1Name"] and req["ability1Value"]:
             search_df = search_df[
                 search_df[req["ability1Name"]] >= int(req["ability1Value"])
@@ -111,10 +119,8 @@ class SearchPlayers:
             ]
 
         search_df = search_df.head(20).fillna(0)
-        del search_df["player_traits"]
 
         player_list = self._build_player_dict(search_df)
-        # TODO: Format Players so that they are easier to process
         return json.dumps(player_list)
 
     def _build_player_dict(self, df: pd.DataFrame) -> List:
@@ -131,9 +137,8 @@ class SearchPlayers:
         List
         """
         players = []
-        position_list = list(self.df.columns.to_list()[80:-1])
+        position_list = list(self.df.columns.to_list()[79::])
         skill_list = self.attributes["skills"].copy()
-        skill_list.remove("player_traits")
 
         for (index_label, player) in df.iterrows():
             player_dict = {
@@ -143,9 +148,13 @@ class SearchPlayers:
             }
             dict_keys = player_dict["skills"].copy()
             for key in dict_keys.keys():
-                player_dict["skills"][re.sub(r"^.*?_", "", key)] = player_dict[
-                    "skills"
-                ].pop(key)
+                # filter skills lower than 40
+                try:
+                    if int(player_dict["skills"][key]) < 45:
+                        player_dict["skills"].pop(key)
+                        continue
+                except ValueError:
+                    player_dict["skills"].pop(key)
 
             players.append(player_dict)
 
@@ -159,12 +168,7 @@ class SearchPlayers:
         -------
         Dict
         """
-        attributes = self.attributes.copy()
-        attributes["skills"] = [
-            re.sub(r"^.*?_", "", skill) for skill in attributes["skills"]
-        ]
-
-        return attributes
+        return self.attributes
 
     def get_suggestion(self, subname: str) -> List[str]:
         """
@@ -193,6 +197,7 @@ if __name__ == "__main__":  # pragma: no cover
         "ability1Value": "80",
         "ability2Name": "overall",
         "ability2Value": "80",
+        "player_value": "99999999999",
     }
 
     search = SearchPlayers()

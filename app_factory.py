@@ -63,6 +63,12 @@ def configure_routes(app):
     def attribute_list():
         return jsonify(fifa_search.get_attributes())
 
+    @app.route("/api/version", methods=["GET"])
+    def version_update():
+        year = request.args.get("year", "")
+        fifa_search.update_dataset(year)
+        return {"response": True}
+
 
 def configure_error_handlers(app):
     @app.errorhandler(404)
