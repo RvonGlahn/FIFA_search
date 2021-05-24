@@ -72,8 +72,6 @@ class SearchPlayers:
                 "short name",
                 "age",
                 "club name",
-                "overall",
-                "potential",
                 "value eur",
                 "wage eur",
                 "player positions",
@@ -120,8 +118,8 @@ class SearchPlayers:
         if req["age"]:
             search_df = search_df[search_df["age"] <= int(req["age"])]
 
-        if req["player value"]:
-            search_df = search_df[search_df["value_eur"] <= int(req["player value"])]
+        if req["player_value"]:
+            search_df = search_df[search_df["value eur"] <= int(req["player_value"])]
 
         if req["ability1Name"] and req["ability1Value"]:
             search_df = search_df[
@@ -210,7 +208,7 @@ class SearchPlayers:
         List[str]
         """
         name_suggest = [
-            name for name in self.df["short_name"].to_list() if subname in name
+            name for name in self.df["short name"].to_list() if subname in name
         ]
         return name_suggest
 
