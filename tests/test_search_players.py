@@ -15,7 +15,7 @@ def test_set_attributes():
     search = SearchPlayers()
 
     assert search.attributes["info"][1] == "age"
-    assert search.attributes["info"][-1] == "physic"
+    assert search.attributes["info"][6] == "joined"
     assert list(search.attributes.keys()) == ["info", "positions", "skills"]
 
 
@@ -30,6 +30,7 @@ def test_get_players(name, potential):
         "ability1Value": potential,
         "ability2Name": "overall",
         "ability2Value": "80",
+        "player_value": "99999999999",
     }
 
     test_search = SearchPlayers().get_players(test_req)
@@ -48,6 +49,7 @@ def test_false_get_players(name, potential, overall):
         "ability1Value": potential,
         "ability2Name": "overall",
         "ability2Value": overall,
+        "player_value": "99999999999",
     }
 
     test_search = SearchPlayers().get_players(test_req)
@@ -65,14 +67,15 @@ def test_age_get_players(age):
         "ability1Value": 80,
         "ability2Name": "overall",
         "ability2Value": "80",
+        "player_value": "99999999999",
     }
 
     search_dict = json.loads(SearchPlayers().get_players(test_req))
 
     if 16 < int(age):
-        assert any(search_dict.values())
+        assert any(search_dict)
     else:
-        assert not any(search_dict.values())
+        assert not any(search_dict)
 
 
 def test_get_attributes_json():
