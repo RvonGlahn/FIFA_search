@@ -21,6 +21,7 @@ class SearchPlayers:
         self.year = "21"
         self.df = pd.DataFrame()
         self.attributes = {}
+        self.grouped_skills = {}
 
         self.update_dataset(self.year)
         self._set_attributes()
@@ -76,7 +77,17 @@ class SearchPlayers:
                 "contract_valid_until",
             ],
             "positions": list(map(str.upper, column_names[80::])),
-            "skills": ["overall", "potential"] + column_names[39:79],
+            "skills": ["overall", "potential"] + column_names[46:79],
+        }
+
+        self.grouped_skills = {
+            "goalkeeping": column_names[75:80],
+            "attacking": column_names[46:51],
+            "skill": column_names[51:56],
+            "mentality": column_names[66:72],
+            "power": column_names[61:66],
+            "defending": column_names[72:75],
+            "movement": column_names[56:61],
         }
 
     def get_players(self, req: Dict) -> str:
@@ -168,7 +179,19 @@ class SearchPlayers:
         -------
         Dict
         """
-        return self.attributes
+        attributes = self.attributes.copy()
+        attributes["skills"] = sorted(attributes["skills"])
+        return attributes
+
+    def get_grouped_attributes(self) -> Dict:
+        """
+        Provides attribute names of dataset as json for info, positions and skills.
+
+        Returns
+        -------
+        Dict
+        """
+        return self.grouped_skills
 
     def get_suggestion(self, subname: str) -> List[str]:
         """
