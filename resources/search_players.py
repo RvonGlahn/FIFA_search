@@ -51,7 +51,8 @@ class SearchPlayers:
             + new_skill_names
             + self.df.columns[79::].tolist()
         )
-        self.df.columns = new_columns
+        clean_columns = [column.replace("_", " ") for column in new_columns]
+        self.df.columns = clean_columns
 
     def _set_attributes(self):
         """
@@ -106,18 +107,18 @@ class SearchPlayers:
         search_df = self.df
 
         if req["name"]:
-            search_df = search_df[search_df["short_name"].str.contains(req["name"])]
+            search_df = search_df[search_df["short name"].str.contains(req["name"])]
 
         if req["position"]:
             search_df = search_df[
-                search_df["player_positions"].str.contains(req["position"])
+                search_df["player positions"].str.contains(req["position"])
             ]
 
         if req["age"]:
             search_df = search_df[search_df["age"] <= int(req["age"])]
 
-        if req["player_value"]:
-            search_df = search_df[search_df["value_eur"] <= int(req["player_value"])]
+        if req["player value"]:
+            search_df = search_df[search_df["value_eur"] <= int(req["player value"])]
 
         if req["ability1Name"] and req["ability1Value"]:
             search_df = search_df[
