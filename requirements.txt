@@ -6,3 +6,4 @@ python-dotenv
 Flask
 Flask-Cors
 pre-commit
+gunicorn
