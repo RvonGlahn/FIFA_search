@@ -41,16 +41,19 @@ class SearchPlayers:
         self.year = year
         data_path = os.path.join(FILE_PATH, "data", "players_" + year + ".csv")
         self.df = pd.read_csv(data_path, low_memory=False, encoding="utf-8")
-        # self.df = self.df.drop(['player_traits'], axis=1)
 
+        # remove group names
         new_skill_names = [
             re.sub(r"^.*?_", "", c) for c in self.df.columns[39:75]
         ] + self.df.columns[75:79].tolist()
+
         new_columns = (
             self.df.columns[0:39].tolist()
             + new_skill_names
             + self.df.columns[79::].tolist()
         )
+
+        # remove underscores
         clean_columns = [column.replace("_", " ") for column in new_columns]
         self.df.columns = clean_columns
 
@@ -66,16 +69,16 @@ class SearchPlayers:
 
         self.attributes = {
             "info": [
-                "short_name",
+                "short name",
                 "age",
-                "club_name",
+                "club name",
                 "overall",
                 "potential",
-                "value_eur",
-                "wage_eur",
-                "player_positions",
+                "value eur",
+                "wage eur",
+                "player positions",
                 "joined",
-                "contract_valid_until",
+                "contract valid until",
             ],
             "positions": list(map(str.upper, column_names[80::])),
             "skills": ["overall", "potential"] + column_names[46:79],
