@@ -154,10 +154,21 @@ class SearchPlayers:
         skill_list = self.attributes["skills"].copy()
 
         for (index_label, player) in df.iterrows():
+            grouped_skills = {
+                "mentality": player[self.grouped_skills["mentality"]].to_dict(),
+                "goalkeeping": player[self.grouped_skills["goalkeeping"]].to_dict(),
+                "attacking": player[self.grouped_skills["attacking"]].to_dict(),
+                "skill": player[self.grouped_skills["skill"]].to_dict(),
+                "power": player[self.grouped_skills["power"]].to_dict(),
+                "defending": player[self.grouped_skills["defending"]].to_dict(),
+                "movement": player[self.grouped_skills["movement"]].to_dict(),
+            }
+
             player_dict = {
                 "info": player[self.attributes["info"]].to_dict(),
                 "positions": player[position_list].to_dict(),
                 "skills": player[skill_list].to_dict(),
+                "grouped skills": grouped_skills,
             }
             dict_keys = player_dict["skills"].copy()
             for key in dict_keys.keys():
