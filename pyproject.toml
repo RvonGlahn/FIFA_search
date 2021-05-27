@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "FIFA API"
+version = "0.1.0"
+description = "Simple API that provides info about players in FIFA"
+authors = ["Rasmus von Glahn <rasmusvong@gmx.de>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+numpy = "^1.19.2"
+pandas = "^1.1.3"
+Flask = "^1.1.2"
+Flask-Cors = "^3.0.10"
+gunicorn = "^20.1.0"
+python-dotenv = "^0.17.0"
+
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.4"
+pytest-cov = "^2.12.0"
+pre-commit = "^2.13.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
