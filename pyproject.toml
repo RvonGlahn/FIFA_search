@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "FIFA API"
+name = "fifa_api"
 version = "0.1.0"
 description = "Simple API that provides info about players in FIFA"
 authors = ["Rasmus von Glahn <rasmusvong@gmx.de>"]
