@@ -4,7 +4,7 @@ LABEL authors="Rasmus von Glahn"
 # Upgrade pip and install poetry
 RUN pip install --upgrade pip && pip install poetry
 
-WORKDIR /api
+WORKDIR /home/api
 
 # Copy only requirements to cache them in docker layer
 COPY poetry.lock pyproject.toml /api/
@@ -18,8 +18,7 @@ COPY . /api
 
 RUN cp .env.default .env
 
-RUN python3 api.py
-
 EXPOSE 5000
 
 CMD ["flask", "run", "--port=5000", "--host=0.0.0.0"]
+# CMD ["gunicorn", "--bind 0.0.0.0:5000", "wsgi:app"]
