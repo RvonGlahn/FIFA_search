@@ -16,7 +16,7 @@ RUN poetry install --no-interaction --no-ansi --no-dev
 # Creating folders, and files for a project:
 COPY . /api
 
-# RUN cp .env.default .env
+# RUN cp .env.default .envenvironemnt vENVIRON
 
 EXPOSE 5000
 
