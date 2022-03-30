@@ -16,9 +16,7 @@ RUN poetry install --no-interaction --no-ansi --no-dev
 # Creating folders, and files for a project:
 COPY . /api
 
-# RUN cp .env.default .envenvironemnt vENVIRON
-
-EXPOSE 5000
+EXPOSE $FLASK_RUN_PORT
 
 CMD ["flask", "run", "--port=5000", "--host=0.0.0.0"]
 # CMD ["gunicorn", "--bind 0.0.0.0:5000", "wsgi:app"]
